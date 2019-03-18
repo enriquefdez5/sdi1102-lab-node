@@ -3,6 +3,11 @@ var express = require('express');
 var app = express();
 // Variables
 app.set('port', 8081);
+app.use(express.static('public'));
+
+var bodyParser = require('body-parser');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
 
 
 //Rutas/controladores por lógica
