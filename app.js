@@ -13,7 +13,6 @@ app.use(expressSession({
 //crypto
 var crypto = require('crypto');
 
-
 //subida de ficheros
 var fileUpload = require('express-fileupload');
 app.use(fileUpload());
@@ -25,6 +24,47 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
+//Inicializamos el gestor de BD que usará MongoDB
+var gestorBD = require("./modules/gestorBD.js");
+gestorBD.init(app,mongo);
+
+// routerUsuarioSession
+var routerUsuarioSession = express.Router();
+routerUsuarioSession.use(function(req, res, next) {
+    console.log("routerUsuarioSession");
+    if ( req.session.usuario ) {
+        // dejamos correr la petición
+        next();
+    } else {
+        console.log("va a : "+req.session.destino)
+        res.redirect("/identificarse");
+    }
+});
+
+//Aplicar routerUsuarioSession
+app.use("/canciones/agregar",routerUsuarioSession);
+app.use("/publicaciones",routerUsuarioSession);
+app.use("/modificar/", routerUsuarioSession);
+
+//routerAudios
+var routerAudios = express.Router();
+routerAudios.use(function(req, res, next) {
+    console.log("routerAudios");
+    var path = require('path');
+    var idCancion = path.basename(req.originalUrl, '.mp3');
+    gestorBD.obtenerCanciones(
+        {id : mongo.ObjectID(idCancion) }, function (canciones) {
+            if(req.session.usuario && canciones[0].autor == req.session.usuario ){
+                next();
+            } else {
+                res.redirect("/tienda");
+            }
+        })
+});
+//Aplicar routerAudios
+app.use("/audios/",routerAudios);
+
+
 
 // Variables
 app.set('port', 8081);
@@ -34,13 +74,6 @@ app.set('crypto',crypto);
 
 app.use(express.static('public'));
 
-//Inicializamos el gestor de BD que usará MongoDB
-var gestorBD = require("./modules/gestorBD.js");
-gestorBD.init(app,mongo);
-
-
-
-var comentarios = [];
 //Rutas/controladores por lógica
 require("./routes/rusuarios.js")(app, swig, gestorBD); // (app, param1, param2, etc.)
 require("./routes/rcanciones.js")(app, swig, gestorBD); // (app, param1, param2, etc.)
