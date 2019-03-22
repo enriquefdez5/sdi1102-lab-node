@@ -2,6 +2,18 @@
 var express = require('express');
 var app = express();
 
+//session
+var expressSession = require('express-session');
+app.use(expressSession({
+    secret: 'abcdefg',
+    resave: true,
+    saveUninitialized: true
+}));
+
+//crypto
+var crypto = require('crypto');
+
+
 //subida de ficheros
 var fileUpload = require('express-fileupload');
 app.use(fileUpload());
@@ -17,6 +29,9 @@ app.use(bodyParser.urlencoded({extended: true}));
 // Variables
 app.set('port', 8081);
 app.set('db', 'mongodb://admin:Caquita05.@tiendamusica-shard-00-00-ntnag.mongodb.net:27017,tiendamusica-shard-00-01-ntnag.mongodb.net:27017,tiendamusica-shard-00-02-ntnag.mongodb.net:27017/test?ssl=true&replicaSet=tiendamusica-shard-0&authSource=admin&retryWrites=true');
+app.set('clave','abcdefg');
+app.set('crypto',crypto);
+
 app.use(express.static('public'));
 
 //Inicializamos el gestor de BD que usará MongoDB

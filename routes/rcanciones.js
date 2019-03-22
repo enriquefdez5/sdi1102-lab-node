@@ -18,6 +18,11 @@ module.exports = function (app, swig, gestorBD) {
     });
 
     app.get('/canciones/agregar', function (req, res) {
+        //con esto comprobamos que el usuario esté logeado
+        if ( req.session.usuario == null){
+            res.redirect("/tienda");
+            return;
+        }
         var respuesta = swig.renderFile('views/bagregar.html', {});
         res.send(respuesta);
     })
@@ -39,10 +44,18 @@ module.exports = function (app, swig, gestorBD) {
     });
 
     app.post("/cancion", function (req, res) {
+        //comprobamos que esté logeado
+        if ( req.session.usuario == null){
+            res.redirect("/tienda");
+            return;
+        }
         var cancion = {
             nombre: req.body.nombre,
             genero: req.body.genero,
-            precio: req.body.precio
+            precio: req.body.precio,
+            // insertamos en autor el usuario que está en sesión
+            autor: req.session.usuario
+
         }
         // Conectarse
         gestorBD.insertarCancion(cancion, function (id) {
