@@ -1,0 +1,11 @@
+{% extends "base.html" %} {% block titulo %} Comentarios {% endblock %}
+
+{% block contenido_principal %}
+
+<ul>
+{% for comentario in comentarios %}
+    <li> {{comentario.autor}} {{comentario.fecha.getFullYear() + "\" + comentario.fecha.getMonth();}} {{comentario.texto}}  </li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

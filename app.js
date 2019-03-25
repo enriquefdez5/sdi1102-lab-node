@@ -77,7 +77,7 @@ app.use(express.static('public'));
 //Rutas/controladores por lógica
 require("./routes/rusuarios.js")(app, swig, gestorBD); // (app, param1, param2, etc.)
 require("./routes/rcanciones.js")(app, swig, gestorBD); // (app, param1, param2, etc.)
-
+require("./routes/comentarios.js")(app,swig,gestorBD);
 
 // lanzar el servidor
 app.listen(app.get('port'), function () {
