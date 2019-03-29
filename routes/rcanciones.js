@@ -136,7 +136,9 @@ module.exports = function (app, swig, gestorBD) {
                     if (result == null) {
                         res.send("Error en la modificación");
                     } else {
-                        res.redirect("/publicaciones");
+                        res.redirect("/publicaciones" +
+                            "?mensaje=Se ha modificado la canción con éxito"+
+                            "&tipoMensaje=alert-success ");
                     }
                 });
             }
@@ -210,8 +212,11 @@ module.exports = function (app, swig, gestorBD) {
         gestorBD.eliminarCancion(criterio,function(canciones){
             if (canciones == null) {
                 res.send(respuesta);
+
             } else {
-                res.redirect("/publicaciones");
+                res.redirect("/publicaciones" +
+                    "?mensaje=Se ha eliminado la canción con éxito"+
+                    "&tipoMensaje=alert-success ");
             }
         });
     })
