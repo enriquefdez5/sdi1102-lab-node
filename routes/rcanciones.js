@@ -137,7 +137,7 @@ module.exports = function (app, swig, gestorBD) {
                         res.send("Error en la modificación");
                     } else {
                         res.redirect("/publicaciones" +
-                            "?mensaje=Se ha modificado la canción con éxito"+
+                            "?mensaje=Se ha modificado la canción con éxito" +
                             "&tipoMensaje=alert-success ");
                     }
                 });
@@ -208,25 +208,56 @@ module.exports = function (app, swig, gestorBD) {
 
 
     app.get('/cancion/eliminar/:id', function (req, res) {
-        var criterio = {"_id" : gestorBD.mongo.ObjectID(req.params.id) };
-        gestorBD.eliminarCancion(criterio,function(canciones){
+        var criterio = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
+        gestorBD.eliminarCancion(criterio, function (canciones) {
             if (canciones == null) {
                 res.send(respuesta);
 
             } else {
                 res.redirect("/publicaciones" +
-                    "?mensaje=Se ha eliminado la canción con éxito"+
+                    "?mensaje=Se ha eliminado la canción con éxito" +
                     "&tipoMensaje=alert-success ");
             }
         });
-    })
+    });
 
 
+    app.get('/cancion/comprar/:id', function (req, res) {
+        var cancionId = gestorBD.mongo.ObjectID(req.params.id);
+        var compra = {
+            usuario: req.session.usuario,
+            cancionId: cancionId
+        }
+        gestorBD.insertarCompra(compra, function (idCompra) {
+            if (idCompra == null) {
+                res.send(respuesta);
+            } else {
+                res.redirect("/compras");
+            }
+        });
+    });
 
-
-
-
-
+    app.get('/compras', function (req, res) {
+        var criterio = {"usuario": req.session.usuario};
+        gestorBD.obtenerCompras(criterio, function (compras) {
+            if (compras == null) {
+                res.send("Error al listar ");
+            } else {
+                var cancionesCompradasIds = [];
+                for (i = 0; i < compras.length; i++) {
+                    cancionesCompradasIds.push(compras[i].cancionId);
+                }
+                var criterio = {"_id": {$in: cancionesCompradasIds}}
+                gestorBD.obtenerCanciones(criterio, function (canciones) {
+                    var respuesta = swig.renderFile('views/bcompras.html',
+                        {
+                            canciones: canciones
+                        });
+                    res.send(respuesta);
+                });
+            }
+        });
+    });
 
 }
 
