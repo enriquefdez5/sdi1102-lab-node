@@ -1,9 +1,11 @@
 module.exports = {
     mongo: null,
     app: null,
-    init: function (app, mongo) {
+    validator: null,
+    init: function (app, mongo, validator) {
         this.mongo = mongo;
         this.app = app;
+        this.validator = validator;
     },
     obtenerCanciones: function (criterio, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {

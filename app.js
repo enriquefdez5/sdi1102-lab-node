@@ -5,6 +5,8 @@ var app = express();
 var fs = require('fs');
 var https = require('https');
 
+const { check, validationResult } = require('express-validator/check');
+
 //session
 var expressSession = require('express-session');
 app.use(expressSession({
@@ -23,6 +25,8 @@ app.use(fileUpload());
 //mongodb
 var mongo = require('mongodb');
 var swig = require('swig');
+
+//esto antes de las peticiones.
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -74,6 +78,10 @@ app.use("/cancion/modificar", routerUsuarioAutor);
 app.use("/cancion/eliminar", routerUsuarioAutor);
 
 
+//https://bit.ly/2WAKY5p
+
+
+
 //routerAudios
 var routerAudios = express.Router();
 routerAudios.use(function (req, res, next) {
@@ -116,6 +124,7 @@ app.use(express.static('public'));
 require("./routes/rusuarios.js")(app, swig, gestorBD); // (app, param1, param2, etc.)
 require("./routes/rcanciones.js")(app, swig, gestorBD); // (app, param1, param2, etc.)
 require("./routes/comentarios.js")(app, swig, gestorBD);
+require("./routes/rapicanciones.js")(app, gestorBD);
 
 
 //página inicio estándar
@@ -139,4 +148,25 @@ https.createServer({
 }, app).listen(app.get('port'), function() {
     console.log("Servidor activo");
 });
+
+
+
+
+/* para la parte de añadir validador (express-validator):
+app.post(...)
+    ...
+    req.check('fieldName', 'error message sent').isLength({
+        min:4
+    })
+    var errors = req.validationErrors();
+    if (errors){
+        req.session.errors = errors
+    }
+    ....
+    configurar mensajes de error en los html
+
+    Los métodos tipo isLength son de una lib validator.js creo
+
+*/
+
 
