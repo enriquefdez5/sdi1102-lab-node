@@ -2,6 +2,9 @@
 var express = require('express');
 var app = express();
 
+var jwt = require('jsonwebtoken');
+app.set('jwt',jwt);
+
 var fs = require('fs');
 var https = require('https');
 
@@ -34,6 +37,45 @@ app.use(bodyParser.urlencoded({extended: true}));
 //Inicializamos el gestor de BD que usará MongoDB
 var gestorBD = require("./modules/gestorBD.js");
 gestorBD.init(app, mongo);
+
+
+// routerUsuarioToken
+var routerUsuarioToken = express.Router();
+routerUsuarioToken.use(function(req,res,next) {
+    // obtener el token, vía headers (opcionalmente GET y/o POST).
+
+    var token = req.headers['token'] || req.body.token ||req.query.token;
+    if (token != null){
+        // verificar el token
+        jwt.verify(token, 'secreto', function(err, infoToken) {
+            if (err || (Date.now()/1000 - infoToken.tiempo) > 240 ){
+                res.status(403); // Forbidden
+                res.json({
+                    acceso : false,
+                    error: 'Token invalido o caducado'
+                });
+                //TODO
+                // También podríamos comprobar que intoToken.usuario existe
+                return;
+
+            } else {
+                // dejamos correr la petición
+                res.usuario = infoToken.usuario;
+                next();
+            }
+        });
+
+    } else {
+        res.status(403); // Forbidden
+        res.json({
+            acceso : false,
+            mensaje: 'No hay Token'
+        });
+    }
+});
+// Aplicar routerUsuarioToken
+app.use('/api/cancion', routerUsuarioToken);
+
 
 // routerUsuarioSession
 var routerUsuarioSession = express.Router();
