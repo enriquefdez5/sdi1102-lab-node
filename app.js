@@ -12,7 +12,6 @@ app.use(function(req, res, next) {
 });
 
 
-
 var jwt = require('jsonwebtoken');
 app.set('jwt',jwt);
 
@@ -66,7 +65,7 @@ routerUsuarioToken.use(function(req,res,next) {
                     error: 'Token invalido o caducado'
                 });
                 //TODO
-                // También podríamos comprobar que intoToken.usuario existe
+                // También podríamos comprobar que intoToken.usuario existe. En el else también.
                 return;
 
             } else {
